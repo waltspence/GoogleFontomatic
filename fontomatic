@@ -1,0 +1,89 @@
+#!/bin/bash
+# ------------------------------------------------------------------
+# [@WaltSpence of @MakeGo] 
+#	Fontomatic Font Installer
+#          This bash script installs google fonts on debian systems
+#          This is licensed under the Unlicense as seen at this link
+#          http://unlicense.org/UNLICENSE
+# ------------------------------------------------------------------
+
+NAME=FONT-O-MATIC
+VERSION=0.4
+SUBJECT=WES-1214-006
+USAGE="Installs Google fonts from https://github.com./google/fonts"
+CHANGELOG="Now using the Official Google Fonts Github Repository"
+
+# --- Options processing -------------------------------------------
+
+WHITE=`tput setaf 7`
+BLUE=`tput setaf 4`
+WBR=`tput setab 7`
+RESET=`tput sgr0`
+CONFIRMED="\n ${BLUE}${WBR}Awesome. Here we go...${RESET}"
+ABORT="\n Well then...good day! "
+BELL='tput bel'
+
+# --- Start --------------------------------------------------------
+
+echo -e "\n ${BLUE}${WBR}Welcome to $NAME v. $VERSION ${RESET} "
+read -r -p "  ${WHITE}This will download the latest Google Fonts and install them for you. Proceed? ${RESET} " response
+case $response in
+    [yY][eE][sS]|[yY])
+	echo -e " ${WHITE} $CONFIRMED ${RESET}"
+    
+		# Welcome user and start.
+		echo -e " ${WHITE} Installing Google Fonts for ya!${RESET}"
+
+		# Make the univeral fonts folder 
+		mkdir ~/.fonts 2>/dev/null
+
+		# Move into fonts folder
+		cd ~/.fonts 2>/dev/null
+
+		# Download the google fonts 
+		wget -q -O fonts.zip https://github.com/google/fonts/zipball/master 2>/dev/null
+
+		# Give feedback that download has finished
+		echo -e "  ${WHITE}Finished downloading from Github. Now importing files to ~/.fonts${RESET}"
+
+		# Unzip the fonts from the zip file
+		unzip -q fonts.zip 2>/dev/null
+
+		# Move .ttf to dev/null
+		mv google*/**/**/*.ttf ~/.fonts 2>/dev/null
+
+		# Give feedback that download has finished
+		echo -e "  ${WHITE}Backing up fonts to ~/.bkp${RESET}"
+
+		# Make a backup of the fonts director
+		mkdir fonts.bkp 2>/dev/null
+		cp -r *.ttf fonts.bkp/ 2>/dev/null
+		zip -qr fonts.bkp{.zip,} 2>/dev/null
+		mv fonts.bkp.zip fonts.bkp-$(date +%F-%T).zip 2>/dev/null
+
+		# Give feedback that download has finished
+		echo -e "  ${WHITE}Cleaning up the ~/.fonts directory and leaving behind only fonts.${RESET}"
+
+		# Clean up the mess by deleting the google and fonts.bkp directories
+		rm -r google*/ 2>/dev/null
+		rm -r fonts.bkp 2>/dev/null
+
+		# Make a backup directory in the home directory
+		mkdir ~/.bkp 2>/dev/null
+
+		# Move dated backup zip file to .bkp (backup) directory and delete
+		mv fonts*.zip ~/.bkp 2>/dev/null
+		rm -r fonts*.zip 2>/dev/null
+
+		# Give user feedback that everything is done
+		echo -e "\n ${BLUE}${WBR}Finished installing Google Fonts. See the ~/.fonts directory for the newly installed fonts.${RESET}"
+		echo -e "\n ${BLUE}${WBR}See the ~/.fonts directory for the newly installed fonts.${RESET}"
+
+		# Send notification in case user is away from terminal and ring a friggin' bell
+		notify-send "FONT-O-MATIC is done installing Google Fonts!"
+		${BELL}
+        ;;
+    *)
+		echo -e "$ABORT"
+        ;;
+esac
